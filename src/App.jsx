@@ -219,7 +219,6 @@ export default function BallparkEstimator() {
   const [regionId, setRegionId] = useState("");
   const [seasonId, setSeasonId] = useState("mid");
   const [rentalWeeks, setRentalWeeks] = useState(4);
-  const [dtDays, setDtDays] = useState(0);
   const [showResult, setShowResult] = useState(false);
 
   const install = INSTALLATIONS.find(i => i.id === installId);
@@ -235,7 +234,7 @@ export default function BallparkEstimator() {
     // DT fait 2 déplacements : montage + démontage (séparés)
     const mDays = install.mountDays;
     const uDays = install.unmountDays;
-    const totalDtDays = dtDays || (mDays + uDays);
+    const totalDtDays = mDays + uDays;
     const trips = 2; // aller-retour montage + aller-retour démontage
 
     const rentalCost = rentalWeeks * profile.rentalPerWeek;
@@ -265,7 +264,7 @@ export default function BallparkEstimator() {
     const totalHigh = lines.reduce((sum, l) => sum + l.high, 0);
 
     return { lines, totalLow, totalHigh };
-  }, [canEstimate, install, region, season, profile, dtDays, rentalWeeks]);
+  }, [canEstimate, install, region, season, profile, rentalWeeks]);
 
   const handleEstimate = useCallback(() => {
     if (canEstimate) setShowResult(true);
@@ -372,7 +371,7 @@ export default function BallparkEstimator() {
                   fontSize: "12px", color: C.muted,
                   fontFamily: "'Space Mono', monospace",
                 }}>
-                  {install.crew} pers. · {install.mountDays}j montage · {install.unmountDays}j démontage
+                  {install.crew} pers. · {install.mountDays}j montage + {install.unmountDays}j démontage
                 </span>
                 <span style={{ fontSize: "12px", color: C.dim }}>
                   — {install.desc}
@@ -403,9 +402,8 @@ export default function BallparkEstimator() {
             </div>
           </div>
 
-          {/* Durée location + Jours DT */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginBottom: "24px" }}>
-          <div>
+          {/* Durée de location */}
+          <div style={{ marginBottom: "24px" }}>
             <label style={labelStyle}>Durée de location</label>
             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
               <input
@@ -423,23 +421,6 @@ export default function BallparkEstimator() {
               />
               <span style={{ fontSize: "12px", color: C.muted }}>semaines</span>
             </div>
-          </div>
-          <div>
-            <label style={labelStyle}>Jours DT <span style={{ fontWeight: 400, opacity: 0.6 }}>(0 = auto)</span></label>
-            <input
-              type="number"
-              min={0}
-              max={30}
-              value={dtDays}
-              onChange={e => { setDtDays(parseInt(e.target.value) || 0); reset(); }}
-              style={{
-                ...inputStyle,
-                width: "90px",
-                MozAppearance: "textfield",
-                textAlign: "center",
-              }}
-            />
-          </div>
           </div>
 
           {/* Bouton */}
